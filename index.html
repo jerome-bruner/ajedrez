@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Torneo de Ajedrez · Zona 05</title>
+
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#6E0F18">
+<meta name="description" content="Torneo de Ajedrez de la Zona Escolar 05 — Colegio Jerome Bruner">
+
+<!-- iPhone -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ajedrez JB">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" type="image/png" href="./icon-192.png">
+
+<style>
+:root{
+  --rojo-osc:#6E0F18;
+  --rojo:#9B1C26;
+  --rojo-cla:#C0392B;
+  --dorado:#C9A227;
+  --dorado-cla:#E6C45A;
+  --fondo:#F4F2EE;
+  --texto:#1C1C1C;
+  --gris:#6B6B6B;
+  --borde:#DAD5CC;
+  --alto-header:62px;
+  --alto-nav:66px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+html,body{
+  height:100%;
+  overflow:hidden;
+  background:var(--fondo);
+  color:var(--texto);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+
+/* ============================ ENCABEZADO ============================ */
+header{
+  position:fixed; top:0; left:0; right:0; z-index:40;
+  height:calc(var(--alto-header) + env(safe-area-inset-top));
+  padding-top:env(safe-area-inset-top);
+  background:linear-gradient(135deg,var(--rojo-osc) 0%,var(--rojo) 55%,var(--rojo-cla) 100%);
+  border-bottom:3px solid var(--dorado);
+  display:flex; align-items:center; gap:11px; padding-left:14px; padding-right:14px;
+  box-shadow:0 2px 10px rgba(0,0,0,.22);
+}
+.escudo{
+  width:38px; height:38px; flex:0 0 38px; border-radius:50%;
+  background:#fff; border:2px solid var(--dorado);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+}
+.escudo svg{width:26px;height:26px}
+.titulos{flex:1; min-width:0; line-height:1.18}
+.titulos .t1{color:#fff; font-size:14.5px; font-weight:700; letter-spacing:.2px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.titulos .t2{color:var(--dorado-cla); font-size:11px; font-weight:600;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.btn-mas{
+  width:34px;height:34px;flex:0 0 34px;border-radius:9px;border:1px solid rgba(255,255,255,.35);
+  background:rgba(255,255,255,.12); color:#fff; font-size:17px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.btn-mas:active{background:rgba(255,255,255,.26)}
+
+/* ============================ CONTENIDO ============================ */
+#marco{
+  position:fixed;
+  top:calc(var(--alto-header) + env(safe-area-inset-top));
+  bottom:calc(var(--alto-nav) + env(safe-area-inset-bottom));
+  left:0; right:0;
+  background:var(--fondo);
+}
+#vista{width:100%;height:100%;border:0;display:block;background:var(--fondo)}
+
+.capa{
+  position:absolute; inset:0; background:var(--fondo); z-index:5;
+  display:none; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:28px 26px; gap:14px;
+}
+.capa.visible{display:flex}
+.capa h2{font-size:17px;font-weight:700}
+.capa p{font-size:14px;color:var(--gris);line-height:1.55;max-width:330px}
+.spinner{
+  width:40px;height:40px;border-radius:50%;
+  border:3px solid var(--borde); border-top-color:var(--rojo);
+  animation:giro .85s linear infinite;
+}
+@keyframes giro{to{transform:rotate(360deg)}}
+.icono-grande{font-size:42px;line-height:1}
+.boton{
+  background:var(--rojo); color:#fff; border:0; border-radius:10px;
+  padding:12px 22px; font-size:14.5px; font-weight:600; cursor:pointer;
+  box-shadow:0 2px 6px rgba(110,15,24,.3);
+}
+.boton:active{background:var(--rojo-osc)}
+.boton.linea{background:transparent;color:var(--rojo);border:1.5px solid var(--rojo);box-shadow:none}
+
+/* ============================ NAVEGACIÓN ============================ */
+nav{
+  position:fixed; bottom:0; left:0; right:0; z-index:40;
+  height:calc(var(--alto-nav) + env(safe-area-inset-bottom));
+  padding-bottom:env(safe-area-inset-bottom);
+  background:#fff; border-top:1px solid var(--borde);
+  display:flex; box-shadow:0 -2px 10px rgba(0,0,0,.07);
+}
+nav button{
+  flex:1; background:none; border:0; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+  color:var(--gris); font-size:11px; font-weight:600; padding-top:7px;
+  border-top:3px solid transparent;
+}
+nav button .ic{font-size:20px;line-height:1}
+nav button.activo{color:var(--rojo); border-top-color:var(--rojo)}
+
+/* ============================ HOJA DE OPCIONES ============================ */
+.fondo-hoja{
+  position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:60;
+  display:none; align-items:flex-end;
+}
+.fondo-hoja.visible{display:flex}
+.hoja{
+  width:100%; background:#fff; border-radius:16px 16px 0 0;
+  padding:18px 20px calc(22px + env(safe-area-inset-bottom));
+  animation:sube .22s ease-out; max-height:88vh; overflow-y:auto;
+}
+@keyframes sube{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.hoja h3{font-size:16px;font-weight:700;margin-bottom:4px}
+.hoja .sub{font-size:12.5px;color:var(--gris);margin-bottom:14px}
+.hoja .division{
+  font-size:11px;font-weight:700;color:var(--gris);letter-spacing:.6px;
+  text-transform:uppercase;margin:14px 0 8px;
+}
+.opcion{
+  width:100%; text-align:left; background:#F7F5F1; border:1px solid var(--borde);
+  border-radius:11px; padding:13px 14px; margin-bottom:9px; cursor:pointer;
+  display:flex; align-items:center; gap:12px; font-size:14px; color:var(--texto);
+}
+.opcion:active{background:#EDEAE4}
+.opcion .ic{font-size:19px;flex:0 0 22px;text-align:center}
+.opcion small{display:block;color:var(--gris);font-size:11.5px;margin-top:2px;font-weight:400}
+.opcion b{font-weight:600}
+
+/* ============================ AVISO DE INSTALAR ============================ */
+#barra-instalar{
+  position:fixed; z-index:50; left:12px; right:12px;
+  bottom:calc(var(--alto-nav) + env(safe-area-inset-bottom) + 12px);
+  background:var(--rojo-osc); color:#fff; border:1.5px solid var(--dorado);
+  border-radius:12px; padding:12px 14px; display:none; align-items:center; gap:12px;
+  box-shadow:0 6px 20px rgba(0,0,0,.3);
+}
+#barra-instalar.visible{display:flex}
+#barra-instalar .txt{flex:1;font-size:13px;line-height:1.4}
+#barra-instalar .txt b{display:block;font-size:13.5px;margin-bottom:1px}
+#barra-instalar button{
+  background:var(--dorado); color:#2A1A00; border:0; border-radius:8px;
+  padding:9px 14px; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap;
+}
+#barra-instalar .cerrar{
+  background:none;color:rgba(255,255,255,.6);font-size:20px;padding:0 2px;width:24px;
+}
+
+/* ============================ INSTRUCCIONES iPHONE ============================ */
+.pasos-ios{text-align:left;background:#fff;border:1px solid var(--borde);border-radius:12px;
+  padding:16px 18px;max-width:340px;width:100%}
+.pasos-ios li{font-size:13.5px;line-height:1.7;margin-left:18px;margin-bottom:5px}
+.pasos-ios li b{color:var(--rojo)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="escudo">
+    <!-- Monograma JB en SVG: no depende de Drive, nunca sale ícono roto -->
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <text x="50" y="50" text-anchor="middle" dominant-baseline="central"
+            font-family="Georgia,'Times New Roman',serif" font-size="52" font-weight="700"
+            fill="#9B1C26">JB</text>
+    </svg>
+  </div>
+  <div class="titulos">
+    <div class="t1" id="tituloApp">Torneo de Ajedrez</div>
+    <div class="t2" id="subtituloApp">Zona Escolar 05 · Colegio Jerome Bruner</div>
+  </div>
+  <button class="btn-mas" id="btnMas" aria-label="Opciones">⋮</button>
+</header>
+
+<div id="marco">
+  <iframe id="vista" title="Torneo de Ajedrez"
+          allow="clipboard-write"
+          referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+  <div class="capa visible" id="capaCarga">
+    <div class="spinner"></div>
+    <p>Cargando el torneo…</p>
+  </div>
+
+  <div class="capa" id="capaOffline">
+    <div class="icono-grande">📡</div>
+    <h2>Sin conexión</h2>
+    <p>Esta aplicación necesita internet para mostrar las partidas y la tabla de posiciones en vivo.</p>
+    <button class="boton" onclick="recargar()">Reintentar</button>
+  </div>
+
+  <div class="capa" id="capaLenta">
+    <div class="icono-grande">⏳</div>
+    <h2>Está tardando más de lo normal</h2>
+    <p>La conexión puede estar lenta, o el navegador está bloqueando el contenido.</p>
+    <button class="boton" onclick="recargar()">Reintentar</button>
+    <button class="boton linea" onclick="abrirFuera()">Abrir en el navegador</button>
+  </div>
+
+  <div class="capa" id="capaConfig">
+    <div class="icono-grande">⚙️</div>
+    <h2>Falta configurar la liga</h2>
+    <p>Abre <b>index.html</b> y pon la URL que termina en <b>/exec</b> de la app del torneo en la constante <b>URL_APP</b>.</p>
+  </div>
+
+  <div class="capa" id="capaIOS">
+    <div class="icono-grande">📲</div>
+    <h2>Instalar en iPhone</h2>
+    <ol class="pasos-ios">
+      <li>Abre esta página en <b>Safari</b> (no en Chrome).</li>
+      <li>Toca el botón <b>Compartir</b> ⬆️ de abajo.</li>
+      <li>Baja y elige <b>Agregar a inicio</b>.</li>
+      <li>Toca <b>Agregar</b> y listo: queda el ícono.</li>
+    </ol>
+    <button class="boton" onclick="cerrarCapa('capaIOS')">Entendido</button>
+  </div>
+</div>
+
+<nav>
+  <button data-ruta="vivo" class="activo"><span class="ic">♟</span>Tablero</button>
+  <button data-ruta="entrar"><span class="ic">🎟️</span>Mi acceso</button>
+  <button data-ruta="registro"><span class="ic">📝</span>Registro</button>
+</nav>
+
+<div id="barra-instalar">
+  <div class="txt"><b>Instala la aplicación</b>Queda como ícono en tu celular.</div>
+  <button id="btnInstalar">Instalar</button>
+  <button class="cerrar" id="btnNoInstalar" aria-label="Cerrar">×</button>
+</div>
+
+<div class="fondo-hoja" id="fondoHoja">
+  <div class="hoja">
+    <h3>Opciones</h3>
+    <div class="sub">Torneo de Ajedrez · Zona Escolar 05</div>
+
+    <div class="division">Documentos del torneo</div>
+    <button class="opcion" onclick="irA('reglamento')">
+      <span class="ic">📋</span><span><b>Reglamento</b><small>Las reglas y el sistema de juego</small></span>
+    </button>
+    <button class="opcion" onclick="irA('cronograma')">
+      <span class="ic">🕗</span><span><b>Cronograma del día</b><small>A qué hora pasa cada cosa</small></span>
+    </button>
+    <button class="opcion" onclick="irA('instructivo')">
+      <span class="ic">📖</span><span><b>Instructivo del profesor</b><small>Para el encargado de cada escuela</small></span>
+    </button>
+
+    <div class="division">Aplicación</div>
+    <button class="opcion" onclick="recargar()">
+      <span class="ic">🔄</span><span><b>Actualizar</b><small>Vuelve a cargar la información del torneo</small></span>
+    </button>
+    <button class="opcion" onclick="abrirFuera()">
+      <span class="ic">🌐</span><span><b>Abrir en el navegador</b><small>Útil si algo no se ve bien aquí</small></span>
+    </button>
+    <button class="opcion" id="opcionInstalar">
+      <span class="ic">📲</span><span><b>Instalar en el celular</b><small>Para tenerla como ícono, sin abrir el navegador</small></span>
+    </button>
+    <button class="opcion" onclick="cerrarHoja()">
+      <span class="ic">✕</span><span><b>Cerrar</b></span>
+    </button>
+  </div>
+</div>
+
+<script>
+/* ===================================================================
+   ================  LO ÚNICO QUE SE CONFIGURA AQUÍ  =================
+
+   URL_APP es la liga de la app web del torneo, la que TERMINA EN /exec.
+
+   Se usa la forma con /a/~/ a propósito: es la que abre bien cuando el
+   celular trae varias cuentas de Google iniciadas, y funciona también
+   sin haber iniciado sesión. Es el mismo token de tu implementación.
+
+   Si algún día republicas con token nuevo, cambia solo esta línea
+   (y súbele el número de VERSION en sw.js).
+   =================================================================== */
+const URL_APP = "https://script.google.com/a/~/macros/s/AKfycbwL5D4xf6F7iiXfng8Vb6VKHrx2TW_ylrEP0LmilN1d4PPzAn4ObWcq1DobIOsxkZlQ/exec";
+
+/* Alterna, por si la de arriba diera problemas en algún dispositivo:
+   "https://script.google.com/macros/s/AKfycbwL5D4xf6F7iiXfng8Vb6VKHrx2TW_ylrEP0LmilN1d4PPzAn4ObWcq1DobIOsxkZlQ/exec" */
+
+const TITULO    = "Torneo de Ajedrez";
+const SUBTITULO = "Zona Escolar 05 · Colegio Jerome Bruner";
+
+/* =================================================================== */
+
+var RUTAS_NAV = ['vivo','entrar','registro'];
+var RUTAS_TODAS = ['vivo','entrar','registro','reglamento','cronograma','instructivo'];
+
+var rutaActual = "vivo";
+var temporizador = null;
+var promptInstalar = null;
+
+document.getElementById('tituloApp').textContent = TITULO;
+document.getElementById('subtituloApp').textContent = SUBTITULO;
+document.title = TITULO;
+
+/* --------------------------- utilidades --------------------------- */
+function mostrarCapa(id){
+  ['capaCarga','capaOffline','capaLenta','capaConfig'].forEach(function(c){
+    document.getElementById(c).classList.remove('visible');
+  });
+  if(id) document.getElementById(id).classList.add('visible');
+}
+function cerrarCapa(id){ document.getElementById(id).classList.remove('visible'); }
+
+function ligaDe(ruta){
+  var base = URL_APP.split('#')[0];
+  return base + (base.indexOf('?') >= 0 ? '&' : '?') + 'p=' + encodeURIComponent(ruta);
+}
+
+function marcarNav(ruta){
+  document.querySelectorAll('nav button').forEach(function(b){
+    b.classList.toggle('activo', b.dataset.ruta === ruta);
+  });
+}
+
+function cargar(ruta){
+  if(!URL_APP){ mostrarCapa('capaConfig'); return; }
+  if(!navigator.onLine){ mostrarCapa('capaOffline'); return; }
+  rutaActual = ruta;
+  marcarNav(ruta);
+  /* solo se recuerda una pantalla del menú de abajo, no un documento suelto */
+  if(RUTAS_NAV.indexOf(ruta) >= 0){
+    try{ localStorage.setItem('ajedrezjb_ruta', ruta); }catch(e){}
+  }
+  mostrarCapa('capaCarga');
+  clearTimeout(temporizador);
+  temporizador = setTimeout(function(){ mostrarCapa('capaLenta'); }, 18000);
+  document.getElementById('vista').src = ligaDe(ruta);
+}
+
+function irA(ruta){ cerrarHoja(); cargar(ruta); }
+function recargar(){ cerrarHoja(); cargar(rutaActual); }
+
+function abrirFuera(){
+  cerrarHoja();
+  if(!URL_APP) return;
+  window.open(ligaDe(rutaActual), '_blank', 'noopener');
+}
+
+document.getElementById('vista').addEventListener('load', function(){
+  clearTimeout(temporizador);
+  mostrarCapa(null);
+});
+
+/* --------------------------- navegación --------------------------- */
+document.querySelectorAll('nav button').forEach(function(b){
+  b.addEventListener('click', function(){ cargar(b.dataset.ruta); });
+});
+
+/* ------------------------ hoja de opciones ------------------------ */
+function abrirHoja(){ document.getElementById('fondoHoja').classList.add('visible'); }
+function cerrarHoja(){ document.getElementById('fondoHoja').classList.remove('visible'); }
+document.getElementById('btnMas').addEventListener('click', abrirHoja);
+document.getElementById('fondoHoja').addEventListener('click', function(e){
+  if(e.target === this) cerrarHoja();
+});
+
+/* --------------------------- conexión --------------------------- */
+window.addEventListener('offline', function(){ mostrarCapa('capaOffline'); });
+window.addEventListener('online',  function(){ cargar(rutaActual); });
+
+/* --------------------------- instalación --------------------------- */
+var esIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+var yaInstalada = window.matchMedia('(display-mode: standalone)').matches ||
+                  window.navigator.standalone === true;
+
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  promptInstalar = e;
+  var oculto = false;
+  try{ oculto = localStorage.getItem('ajedrezjb_no_instalar') === '1'; }catch(err){}
+  if(!yaInstalada && !oculto){
+    setTimeout(function(){
+      document.getElementById('barra-instalar').classList.add('visible');
+    }, 2500);
+  }
+});
+
+function pedirInstalacion(){
+  cerrarHoja();
+  document.getElementById('barra-instalar').classList.remove('visible');
+  if(promptInstalar){
+    promptInstalar.prompt();
+    promptInstalar.userChoice.then(function(){ promptInstalar = null; });
+  }else if(esIOS){
+    document.getElementById('capaIOS').classList.add('visible');
+  }else if(yaInstalada){
+    alert('La aplicación ya está instalada en este dispositivo.');
+  }else{
+    alert('Busca en el menú de tu navegador la opción "Instalar aplicación" o "Agregar a pantalla de inicio".');
+  }
+}
+document.getElementById('btnInstalar').addEventListener('click', pedirInstalacion);
+document.getElementById('opcionInstalar').addEventListener('click', pedirInstalacion);
+document.getElementById('btnNoInstalar').addEventListener('click', function(){
+  document.getElementById('barra-instalar').classList.remove('visible');
+  try{ localStorage.setItem('ajedrezjb_no_instalar','1'); }catch(e){}
+});
+
+/* el iPhone no dispara beforeinstallprompt: el aviso se arma aparte */
+if(esIOS && !yaInstalada){
+  var ocultoIOS = false;
+  try{ ocultoIOS = localStorage.getItem('ajedrezjb_no_instalar') === '1'; }catch(e){}
+  if(!ocultoIOS){
+    setTimeout(function(){
+      document.getElementById('barra-instalar').classList.add('visible');
+    }, 3000);
+  }
+}
+
+/* --------------------------- service worker --------------------------- */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
+  });
+}
+
+/* --------------------------- arranque --------------------------- */
+(function(){
+  var inicial = 'vivo';
+
+  /* acceso directo del ícono (los shortcuts del manifest): ?ir=entrar */
+  var pedida = null;
+  try{ pedida = new URLSearchParams(window.location.search).get('ir'); }catch(e){}
+
+  if(pedida && RUTAS_TODAS.indexOf(pedida) >= 0){
+    inicial = pedida;
+  }else{
+    var guardada = null;
+    try{ guardada = localStorage.getItem('ajedrezjb_ruta'); }catch(e){}
+    if(guardada && RUTAS_NAV.indexOf(guardada) >= 0) inicial = guardada;
+  }
+  cargar(inicial);
+})();
+</script>
+</body>
+</html>
