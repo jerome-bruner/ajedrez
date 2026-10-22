@@ -144,6 +144,7 @@ nav button.activo{color:var(--rojo); border-top-color:var(--rojo)}
   display:flex; align-items:center; gap:12px; font-size:14px; color:var(--texto);
 }
 .opcion:active{background:#EDEAE4}
+.opcion.destacada{background:#FBF2D9;border-color:var(--dorado)}
 .opcion .ic{font-size:19px;flex:0 0 22px;text-align:center}
 .opcion small{display:block;color:var(--gris);font-size:11.5px;margin-top:2px;font-weight:400}
 .opcion b{font-weight:600}
@@ -212,8 +213,9 @@ nav button.activo{color:var(--rojo); border-top-color:var(--rojo)}
   <div class="capa" id="capaLenta">
     <div class="icono-grande">⏳</div>
     <h2>Está tardando más de lo normal</h2>
-    <p>La conexión puede estar lenta, o el navegador está bloqueando el contenido.</p>
-    <button class="boton" onclick="recargar()">Reintentar</button>
+    <p>Puede ser la conexión, o que tu celular necesite la otra forma de la liga.</p>
+    <button class="boton" onclick="cambiarLiga()">Probar la otra liga</button>
+    <button class="boton linea" onclick="recargar()">Reintentar</button>
     <button class="boton linea" onclick="abrirFuera()">Abrir en el navegador</button>
   </div>
 
@@ -253,6 +255,18 @@ nav button.activo{color:var(--rojo); border-top-color:var(--rojo)}
     <h3>Opciones</h3>
     <div class="sub">Torneo de Ajedrez · Zona Escolar 05</div>
 
+    <div class="division">Si algo no se ve</div>
+    <button class="opcion destacada" onclick="cambiarLiga()">
+      <span class="ic">🔀</span><span><b>La pantalla no carga</b>
+      <small id="textoLiga">Cambia a la otra forma de la liga de Google</small></span>
+    </button>
+    <button class="opcion" onclick="recargar()">
+      <span class="ic">🔄</span><span><b>Actualizar</b><small>Vuelve a cargar la información del torneo</small></span>
+    </button>
+    <button class="opcion" onclick="abrirFuera()">
+      <span class="ic">🌐</span><span><b>Abrir en el navegador</b><small>Fuera de la aplicación, en una pestaña aparte</small></span>
+    </button>
+
     <div class="division">Documentos del torneo</div>
     <button class="opcion" onclick="irA('reglamento')">
       <span class="ic">📋</span><span><b>Reglamento</b><small>Las reglas y el sistema de juego</small></span>
@@ -265,12 +279,6 @@ nav button.activo{color:var(--rojo); border-top-color:var(--rojo)}
     </button>
 
     <div class="division">Aplicación</div>
-    <button class="opcion" onclick="recargar()">
-      <span class="ic">🔄</span><span><b>Actualizar</b><small>Vuelve a cargar la información del torneo</small></span>
-    </button>
-    <button class="opcion" onclick="abrirFuera()">
-      <span class="ic">🌐</span><span><b>Abrir en el navegador</b><small>Útil si algo no se ve bien aquí</small></span>
-    </button>
     <button class="opcion" id="opcionInstalar">
       <span class="ic">📲</span><span><b>Instalar en el celular</b><small>Para tenerla como ícono, sin abrir el navegador</small></span>
     </button>
@@ -284,19 +292,34 @@ nav button.activo{color:var(--rojo); border-top-color:var(--rojo)}
 /* ===================================================================
    ================  LO ÚNICO QUE SE CONFIGURA AQUÍ  =================
 
-   URL_APP es la liga de la app web del torneo, la que TERMINA EN /exec.
+   Google sirve la misma app web en dos formas de liga, y NINGUNA
+   funciona para todo el mundo:
 
-   Se usa la forma con /a/~/ a propósito: es la que abre bien cuando el
-   celular trae varias cuentas de Google iniciadas, y funciona también
-   sin haber iniciado sesión. Es el mismo token de tu implementación.
+     PLANA   /macros/s/<token>/exec
+             Funciona con cuentas institucionales (Workspace) y con
+             quien entra sin sesión. Es la predeterminada.
 
-   Si algún día republicas con token nuevo, cambia solo esta línea
+     TILDE   /a/~/macros/s/<token>/exec
+             Es la buena para gente de fuera con varias cuentas de
+             Google iniciadas. Con una sesión de Workspace devuelve
+             "No se puede abrir el archivo en estos momentos".
+
+   Por eso la app trae las dos y el usuario puede alternar desde el
+   menú ⋮ → "La pantalla no carga". La elección se guarda en ese
+   celular y ya no se vuelve a preguntar.
+
+   Si algún día republicas con token nuevo, cambia solo TOKEN de abajo
    (y súbele el número de VERSION en sw.js).
    =================================================================== */
-const URL_APP = "https://script.google.com/a/~/macros/s/AKfycbwL5D4xf6F7iiXfng8Vb6VKHrx2TW_ylrEP0LmilN1d4PPzAn4ObWcq1DobIOsxkZlQ/exec";
 
-/* Alterna, por si la de arriba diera problemas en algún dispositivo:
-   "https://script.google.com/macros/s/AKfycbwL5D4xf6F7iiXfng8Vb6VKHrx2TW_ylrEP0LmilN1d4PPzAn4ObWcq1DobIOsxkZlQ/exec" */
+const TOKEN = "AKfycbwL5D4xf6F7iiXfng8Vb6VKHrx2TW_ylrEP0LmilN1d4PPzAn4ObWcq1DobIOsxkZlQ";
+
+const LIGAS = {
+  plana: "https://script.google.com/macros/s/" + TOKEN + "/exec",
+  tilde: "https://script.google.com/a/~/macros/s/" + TOKEN + "/exec"
+};
+
+const LIGA_PREDETERMINADA = "plana";
 
 const TITULO    = "Torneo de Ajedrez";
 const SUBTITULO = "Zona Escolar 05 · Colegio Jerome Bruner";
@@ -307,12 +330,36 @@ var RUTAS_NAV = ['vivo','entrar','registro'];
 var RUTAS_TODAS = ['vivo','entrar','registro','reglamento','cronograma','instructivo'];
 
 var rutaActual = "vivo";
+var ligaActual = LIGA_PREDETERMINADA;
 var temporizador = null;
 var promptInstalar = null;
 
 document.getElementById('tituloApp').textContent = TITULO;
 document.getElementById('subtituloApp').textContent = SUBTITULO;
 document.title = TITULO;
+
+/* --------------------------- la liga --------------------------- */
+(function(){
+  var guardada = null;
+  try{ guardada = localStorage.getItem('ajedrezjb_liga'); }catch(e){}
+  if(guardada && LIGAS[guardada]) ligaActual = guardada;
+})();
+
+function textoDeLiga(){
+  var t = document.getElementById('textoLiga');
+  if(!t) return;
+  t.textContent = ligaActual === 'plana'
+    ? 'Ahora usa la liga normal. Tócalo para probar la otra.'
+    : 'Ahora usa la liga alterna. Tócalo para volver a la normal.';
+}
+
+function cambiarLiga(){
+  ligaActual = (ligaActual === 'plana') ? 'tilde' : 'plana';
+  try{ localStorage.setItem('ajedrezjb_liga', ligaActual); }catch(e){}
+  textoDeLiga();
+  cerrarHoja();
+  cargar(rutaActual);
+}
 
 /* --------------------------- utilidades --------------------------- */
 function mostrarCapa(id){
@@ -324,8 +371,8 @@ function mostrarCapa(id){
 function cerrarCapa(id){ document.getElementById(id).classList.remove('visible'); }
 
 function ligaDe(ruta){
-  var base = URL_APP.split('#')[0];
-  return base + (base.indexOf('?') >= 0 ? '&' : '?') + 'p=' + encodeURIComponent(ruta);
+  var base = LIGAS[ligaActual];
+  return base + '?p=' + encodeURIComponent(ruta);
 }
 
 function marcarNav(ruta){
@@ -335,7 +382,7 @@ function marcarNav(ruta){
 }
 
 function cargar(ruta){
-  if(!URL_APP){ mostrarCapa('capaConfig'); return; }
+  if(!TOKEN){ mostrarCapa('capaConfig'); return; }
   if(!navigator.onLine){ mostrarCapa('capaOffline'); return; }
   rutaActual = ruta;
   marcarNav(ruta);
@@ -345,7 +392,7 @@ function cargar(ruta){
   }
   mostrarCapa('capaCarga');
   clearTimeout(temporizador);
-  temporizador = setTimeout(function(){ mostrarCapa('capaLenta'); }, 18000);
+  temporizador = setTimeout(function(){ mostrarCapa('capaLenta'); }, 15000);
   document.getElementById('vista').src = ligaDe(ruta);
 }
 
@@ -354,7 +401,6 @@ function recargar(){ cerrarHoja(); cargar(rutaActual); }
 
 function abrirFuera(){
   cerrarHoja();
-  if(!URL_APP) return;
   window.open(ligaDe(rutaActual), '_blank', 'noopener');
 }
 
@@ -369,7 +415,10 @@ document.querySelectorAll('nav button').forEach(function(b){
 });
 
 /* ------------------------ hoja de opciones ------------------------ */
-function abrirHoja(){ document.getElementById('fondoHoja').classList.add('visible'); }
+function abrirHoja(){
+  textoDeLiga();
+  document.getElementById('fondoHoja').classList.add('visible');
+}
 function cerrarHoja(){ document.getElementById('fondoHoja').classList.remove('visible'); }
 document.getElementById('btnMas').addEventListener('click', abrirHoja);
 document.getElementById('fondoHoja').addEventListener('click', function(e){

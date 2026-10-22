@@ -15,7 +15,7 @@
    que ya la tienen instalada seguirán mostrando la versión anterior.
    ===================================================================== */
 
-const VERSION = 'ajedrez-jb-v1';
+const VERSION = 'ajedrez-jb-v2';
 
 const ARCHIVOS = [
   './',
