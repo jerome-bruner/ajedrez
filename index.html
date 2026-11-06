@@ -458,7 +458,7 @@ function borrar(clave){
    dura.
 
    El trato con la página del torneo:
-     · al abrir «Mi acceso» se le manda el código en la liga (&c=...)
+     · al cargar, ella pide el código y aquí se le contesta si lo hay
      · ella avisa de vuelta: entró bien, el código ya no sirve, o salió
    =================================================================== */
 
@@ -488,7 +488,18 @@ function olvidarCodigo(){
   cargar('entrar');
 }
 
-/* Lo que la página del torneo nos cuenta. Solo se escucha a Google. */
+/* Lo que la página del torneo nos cuenta. Solo se escucha a Google.
+
+   La conversación completa:
+     torneo → «pide-codigo»   al cargar, para saber si este celular tiene uno
+     app    → «toma-codigo»   se lo contesta solo si hay
+     torneo → «codigo-ok»     alguien entró bien: guárdalo
+     torneo → «codigo-malo»   el guardado ya no sirve: bórralo
+     torneo → «salir»         tocaron Salir: bórralo
+
+   La respuesta va directo a quien preguntó (ev.source). Hace falta así
+   porque Apps Script mete la página dentro de DOS marcos y desde aquí no
+   hay forma de alcanzar el de adentro por nuestra cuenta. */
 window.addEventListener('message', function(ev){
   var o = String(ev.origin || '');
   var esDeGoogle = /\.googleusercontent\.com$/.test(o) || o === 'https://script.google.com';
@@ -496,6 +507,19 @@ window.addEventListener('message', function(ev){
 
   var d = ev.data;
   if(!d || d.de !== 'torneo-ajedrez-jb') return;
+
+  if(d.accion === 'pide-codigo'){
+    if(codigoGuardado && ev.source){
+      try{
+        ev.source.postMessage({
+          de: 'app-ajedrez-jb',
+          accion: 'toma-codigo',
+          codigo: codigoGuardado
+        }, o);
+      }catch(e){}
+    }
+    return;
+  }
 
   if(d.accion === 'codigo-ok')    guardarCodigo(d.codigo);
   if(d.accion === 'codigo-malo')  { codigoGuardado=''; borrar('ajedrezjb_codigo'); pintarSesion(); }
@@ -532,13 +556,13 @@ function mostrarCapa(id){
   if(id) document.getElementById(id).classList.add('visible');
 }
 
+/* OJO: la liga va LIMPIA, con un solo parámetro.
+   La forma /a/~/ de Google no aguanta un segundo parámetro: al agregarle
+   el código (&c=...) devolvía "No se puede abrir el archivo en estos
+   momentos". Por eso el código ya no viaja aquí, sino por mensaje, cuando
+   la página del torneo lo pide. Ver el escuchador de mensajes arriba. */
 function ligaDe(ruta){
-  var u = LIGAS[ligaActual] + '?p=' + encodeURIComponent(ruta);
-  /* el código solo viaja a la pantalla que lo necesita */
-  if(ruta === 'entrar' && codigoGuardado){
-    u += '&c=' + encodeURIComponent(codigoGuardado);
-  }
-  return u;
+  return LIGAS[ligaActual] + '?p=' + encodeURIComponent(ruta);
 }
 
 function marcarNav(ruta){
