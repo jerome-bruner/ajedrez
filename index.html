@@ -48,7 +48,8 @@ header{
   padding-top:env(safe-area-inset-top);
   background:linear-gradient(135deg,var(--rojo-osc) 0%,var(--rojo) 55%,var(--rojo-cla) 100%);
   border-bottom:3px solid var(--dorado);
-  display:flex; align-items:center; gap:11px; padding-left:14px; padding-right:14px;
+  display:flex; align-items:center; gap:11px;
+  padding-left:16px; padding-right:18px;
   box-shadow:0 2px 10px rgba(0,0,0,.22);
 }
 .escudo{
@@ -64,7 +65,7 @@ header{
 .titulos .t2{color:var(--dorado-cla); font-size:11px; font-weight:600;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .btn-mas{
-  width:34px;height:34px;flex:0 0 34px;border-radius:9px;border:1px solid rgba(255,255,255,.35);
+  width:36px;height:36px;flex:0 0 36px;border-radius:9px;border:1px solid rgba(255,255,255,.35);
   background:rgba(255,255,255,.12); color:#fff; font-size:17px;
   display:flex;align-items:center;justify-content:center;cursor:pointer;
 }
@@ -102,6 +103,9 @@ header{
 }
 .boton:active{background:var(--rojo-osc)}
 .boton.linea{background:transparent;color:var(--rojo);border:1.5px solid var(--rojo);box-shadow:none}
+.lista-ayuda{text-align:left;background:#fff;border:1px solid var(--borde);border-radius:12px;
+  padding:15px 18px;max-width:340px;width:100%}
+.lista-ayuda li{font-size:13.5px;line-height:1.6;margin-left:18px;margin-bottom:6px}
 
 /* ============================ NAVEGACIÓN ============================ */
 nav{
@@ -112,6 +116,7 @@ nav{
   display:flex; box-shadow:0 -2px 10px rgba(0,0,0,.07);
 }
 nav button{
+  position:relative;
   flex:1; background:none; border:0; cursor:pointer;
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
   color:var(--gris); font-size:11px; font-weight:600; padding-top:7px;
@@ -119,6 +124,14 @@ nav button{
 }
 nav button .ic{font-size:20px;line-height:1}
 nav button.activo{color:var(--rojo); border-top-color:var(--rojo)}
+/* puntito verde: avisa que este celular ya trae un código guardado */
+nav button .punto{
+  position:absolute; top:9px; left:50%; margin-left:9px;
+  width:8px; height:8px; border-radius:50%;
+  background:#1B5E20; border:1.5px solid #fff;
+  display:none;
+}
+nav button.con-sesion .punto{display:block}
 
 /* ============================ HOJA DE OPCIONES ============================ */
 .fondo-hoja{
@@ -148,27 +161,63 @@ nav button.activo{color:var(--rojo); border-top-color:var(--rojo)}
 .opcion .ic{font-size:19px;flex:0 0 22px;text-align:center}
 .opcion small{display:block;color:var(--gris);font-size:11.5px;margin-top:2px;font-weight:400}
 .opcion b{font-weight:600}
+.opcion.oculta{display:none}
 
-/* ============================ AVISO DE INSTALAR ============================ */
-#barra-instalar{
-  position:fixed; z-index:50; left:12px; right:12px;
+/* ================== BIENVENIDA (la que ve quien llega por el QR) ================== */
+#bienvenida{
+  position:fixed; inset:0; z-index:80; background:#fff;
+  display:none; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:30px 26px calc(30px + env(safe-area-inset-bottom));
+}
+#bienvenida.visible{display:flex}
+#bienvenida .ico{
+  width:92px;height:92px;border-radius:21px;margin-bottom:17px;
+  background:linear-gradient(140deg,var(--rojo-osc),var(--rojo-cla));
+  border:3px solid var(--dorado);
+  display:flex;align-items:center;justify-content:center;
+  font-size:46px;color:#fff;box-shadow:0 5px 16px rgba(110,15,24,.3);
+}
+#bienvenida h2{font-size:19px;font-weight:700;line-height:1.3;margin-bottom:7px}
+#bienvenida .lema{font-size:14px;color:var(--gris);line-height:1.5;margin-bottom:19px;max-width:330px}
+.ventajas{
+  text-align:left;background:#F7F5F1;border:1.5px solid var(--borde);border-radius:12px;
+  padding:14px 16px;margin-bottom:19px;max-width:340px;width:100%;
+}
+.ventajas div{font-size:14px;line-height:1.5;margin-bottom:8px;display:flex;gap:11px}
+.ventajas div:last-child{margin-bottom:0}
+.ventajas div span{flex:0 0 20px;text-align:center}
+#bienvenida .b1{
+  width:100%;max-width:340px;background:var(--rojo);color:#fff;border:0;border-radius:11px;
+  padding:15px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;
+  box-shadow:0 3px 9px rgba(110,15,24,.3);margin-bottom:9px;
+}
+#bienvenida .b1:active{background:var(--rojo-osc)}
+#bienvenida .b2{
+  background:none;border:0;color:var(--gris);font-size:13.5px;font-weight:600;
+  cursor:pointer;font-family:inherit;padding:9px;text-decoration:underline;
+}
+
+/* ====================== PREGUNTA «¿SE VE EL TABLERO?» ====================== */
+#pregunta{
+  position:fixed; z-index:55; left:12px; right:12px;
   bottom:calc(var(--alto-nav) + env(safe-area-inset-bottom) + 12px);
-  background:var(--rojo-osc); color:#fff; border:1.5px solid var(--dorado);
-  border-radius:12px; padding:12px 14px; display:none; align-items:center; gap:12px;
-  box-shadow:0 6px 20px rgba(0,0,0,.3);
+  background:#5E3B00; color:#fff; border:1.5px solid var(--dorado-cla);
+  border-radius:12px; padding:13px 14px; display:none;
+  box-shadow:0 6px 20px rgba(0,0,0,.35);
 }
-#barra-instalar.visible{display:flex}
-#barra-instalar .txt{flex:1;font-size:13px;line-height:1.4}
-#barra-instalar .txt b{display:block;font-size:13.5px;margin-bottom:1px}
-#barra-instalar button{
-  background:var(--dorado); color:#2A1A00; border:0; border-radius:8px;
-  padding:9px 14px; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap;
+#pregunta.visible{display:block; animation:sube .28s ease-out}
+#pregunta .texto{font-size:13.5px;font-weight:700;line-height:1.35;margin-bottom:3px}
+#pregunta .sub{font-size:11.5px;line-height:1.4;color:#F0DEB4;margin-bottom:11px}
+#pregunta .botones{display:flex;gap:9px}
+#pregunta button{
+  flex:1; border:0; border-radius:9px; padding:11px 10px;
+  font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;
 }
-#barra-instalar .cerrar{
-  background:none;color:rgba(255,255,255,.6);font-size:20px;padding:0 2px;width:24px;
-}
+#pregunta .si{background:var(--dorado-cla);color:#2A1A00}
+#pregunta .no{background:rgba(255,255,255,.14);color:#fff;border:1.5px solid rgba(255,255,255,.55)}
 
 /* ============================ INSTRUCCIONES iPHONE ============================ */
+#capaIOS{z-index:85}
 .pasos-ios{text-align:left;background:#fff;border:1px solid var(--borde);border-radius:12px;
   padding:16px 18px;max-width:340px;width:100%}
 .pasos-ios li{font-size:13.5px;line-height:1.7;margin-left:18px;margin-bottom:5px}
@@ -210,44 +259,68 @@ nav button.activo{color:var(--rojo); border-top-color:var(--rojo)}
     <button class="boton" onclick="recargar()">Reintentar</button>
   </div>
 
-  <div class="capa" id="capaLenta">
-    <div class="icono-grande">⏳</div>
-    <h2>Está tardando más de lo normal</h2>
-    <p>Puede ser la conexión, o que tu celular necesite la otra forma de la liga.</p>
-    <button class="boton" onclick="cambiarLiga()">Probar la otra liga</button>
-    <button class="boton linea" onclick="recargar()">Reintentar</button>
-    <button class="boton linea" onclick="abrirFuera()">Abrir en el navegador</button>
-  </div>
-
   <div class="capa" id="capaConfig">
     <div class="icono-grande">⚙️</div>
     <h2>Falta configurar la liga</h2>
-    <p>Abre <b>index.html</b> y pon la URL que termina en <b>/exec</b> de la app del torneo en la constante <b>URL_APP</b>.</p>
+    <p>Abre <b>index.html</b> y pon el token de la app del torneo en la constante <b>TOKEN</b>.</p>
   </div>
 
-  <div class="capa" id="capaIOS">
-    <div class="icono-grande">📲</div>
-    <h2>Instalar en iPhone</h2>
-    <ol class="pasos-ios">
-      <li>Abre esta página en <b>Safari</b> (no en Chrome).</li>
-      <li>Toca el botón <b>Compartir</b> ⬆️ de abajo.</li>
-      <li>Baja y elige <b>Agregar a inicio</b>.</li>
-      <li>Toca <b>Agregar</b> y listo: queda el ícono.</li>
+  <!-- se muestra cuando ya se probaron las dos formas de liga y ninguna sirvió -->
+  <div class="capa" id="capaAyuda">
+    <div class="icono-grande">🤔</div>
+    <h2>Probemos de otra forma</h2>
+    <p>Ya intentamos las dos maneras de abrir el torneo. Cualquiera de estas lo resuelve:</p>
+    <ol class="lista-ayuda">
+      <li>Abre el torneo fuera de la aplicación, con el botón de abajo.</li>
+      <li>O cierra sesión de las cuentas de Google que tengas abiertas y vuelve a entrar.</li>
+      <li>O ábrelo en una ventana privada o de incógnito.</li>
     </ol>
-    <button class="boton" onclick="cerrarCapa('capaIOS')">Entendido</button>
+    <button class="boton" onclick="abrirFuera()">Abrir en el navegador</button>
+    <button class="boton linea" onclick="reintentarTodo()">Volver a intentar aquí</button>
   </div>
+</div>
+
+<!-- pasos de iPhone: fuera del marco, para que tape todo -->
+<div class="capa" id="capaIOS" style="position:fixed;inset:0">
+  <div class="icono-grande">📲</div>
+  <h2>Instalar en iPhone</h2>
+  <ol class="pasos-ios">
+    <li>Esta página tiene que estar abierta en <b>Safari</b> (no en Chrome).</li>
+    <li>Toca el botón <b>Compartir</b> ⬆️ de la barra de abajo.</li>
+    <li>Baja y elige <b>Agregar a inicio</b>.</li>
+    <li>Toca <b>Agregar</b> y listo: queda el ícono.</li>
+  </ol>
+  <button class="boton" onclick="cerrarIOS()">Entendido</button>
 </div>
 
 <nav>
   <button data-ruta="vivo" class="activo"><span class="ic">♟</span>Tablero</button>
-  <button data-ruta="entrar"><span class="ic">🎟️</span>Mi acceso</button>
+  <button data-ruta="entrar" id="navEntrar"><span class="punto"></span><span class="ic">🎟️</span>Mi acceso</button>
   <button data-ruta="registro"><span class="ic">📝</span>Registro</button>
 </nav>
 
-<div id="barra-instalar">
-  <div class="txt"><b>Instala la aplicación</b>Queda como ícono en tu celular.</div>
-  <button id="btnInstalar">Instalar</button>
-  <button class="cerrar" id="btnNoInstalar" aria-label="Cerrar">×</button>
+<!-- ============ la pregunta de los 4 segundos ============ -->
+<div id="pregunta">
+  <div class="texto" id="preguntaTexto">¿Ya ves el tablero del torneo?</div>
+  <div class="sub">Si en su lugar te salió una pantalla de Google, toca «No».</div>
+  <div class="botones">
+    <button class="si" onclick="respuestaSi()">Sí</button>
+    <button class="no" onclick="respuestaNo()">No</button>
+  </div>
+</div>
+
+<!-- ============ bienvenida: lo primero que ve quien llega por el QR ============ -->
+<div id="bienvenida">
+  <div class="ico">♞</div>
+  <h2>Torneo de Ajedrez<br>Zona Escolar 05</h2>
+  <div class="lema">Instálala y sigue el torneo desde tu pantalla de inicio.</div>
+  <div class="ventajas">
+    <div><span>♟</span>El tablero en vivo y la tabla de posiciones</div>
+    <div><span>🎟️</span>Tu acceso con tu código, sin volver a teclearlo</div>
+    <div><span>📋</span>Reglamento y cronograma del día</div>
+  </div>
+  <button class="b1" id="btnInstalarBien">Instalar la aplicación</button>
+  <button class="b2" onclick="saltarBienvenida()">Ver el torneo sin instalar</button>
 </div>
 
 <div class="fondo-hoja" id="fondoHoja">
@@ -255,8 +328,18 @@ nav button.activo{color:var(--rojo); border-top-color:var(--rojo)}
     <h3>Opciones</h3>
     <div class="sub">Torneo de Ajedrez · Zona Escolar 05</div>
 
+    <div class="division">Tu acceso</div>
+    <button class="opcion destacada oculta" id="opcionSalir" onclick="olvidarCodigo()">
+      <span class="ic">🔑</span><span><b>No soy yo</b>
+      <small id="textoSesion">Olvida el código guardado en este celular</small></span>
+    </button>
+    <button class="opcion oculta" id="opcionSinCodigo" onclick="irA('entrar')">
+      <span class="ic">🎟️</span><span><b>Entrar con mi código</b>
+      <small>Para participantes, encargados y jueces</small></span>
+    </button>
+
     <div class="division">Si algo no se ve</div>
-    <button class="opcion destacada" onclick="cambiarLiga()">
+    <button class="opcion" onclick="cambiarLiga(true)">
       <span class="ic">🔀</span><span><b>La pantalla no carga</b>
       <small id="textoLiga">Cambia a la otra forma de la liga de Google</small></span>
     </button>
@@ -296,19 +379,24 @@ nav button.activo{color:var(--rojo); border-top-color:var(--rojo)}
    funciona para todo el mundo:
 
      PLANA   /macros/s/<token>/exec
-             Funciona con cuentas institucionales (Workspace) y con
-             quien entra sin sesión. Es la predeterminada.
+             Sirve con cuentas institucionales (Workspace) y con quien
+             entra sin sesión iniciada.
 
      TILDE   /a/~/macros/s/<token>/exec
-             Es la buena para gente de fuera con varias cuentas de
-             Google iniciadas. Con una sesión de Workspace devuelve
+             Hace falta cuando alguien trae varias cuentas de Google
+             abiertas. Con una sesión de Workspace devuelve
              "No se puede abrir el archivo en estos momentos".
 
-   Por eso la app trae las dos y el usuario puede alternar desde el
-   menú ⋮ → "La pantalla no carga". La elección se guarda en ese
-   celular y ya no se vuelve a preguntar.
+   No hay manera de saber desde aquí cuál le toca a cada quien: el
+   contenido del marco lo sirve Google desde otro dominio, así que la
+   pantalla de error "carga" igual de bien que el tablero. Por eso la
+   app PREGUNTA a los 4 segundos y se queda con la que funcionó.
 
-   Si algún día republicas con token nuevo, cambia solo TOKEN de abajo
+   Arranca en "tilde" porque esta app se reparte a participantes y
+   encargados de otras escuelas, que entran con cuenta personal o sin
+   sesión. Para una pieza de uso interno del colegio iría en "plana".
+
+   Si algún día republicas con token nuevo, cambia solo TOKEN
    (y súbele el número de VERSION en sw.js).
    =================================================================== */
 
@@ -319,7 +407,10 @@ const LIGAS = {
   tilde: "https://script.google.com/a/~/macros/s/" + TOKEN + "/exec"
 };
 
-const LIGA_PREDETERMINADA = "plana";
+const LIGA_PREDETERMINADA = "tilde";
+
+/* segundos que espera antes de preguntar si se ve el tablero */
+const SEGUNDOS_PREGUNTA = 4;
 
 const TITULO    = "Torneo de Ajedrez";
 const SUBTITULO = "Zona Escolar 05 · Colegio Jerome Bruner";
@@ -331,20 +422,87 @@ var RUTAS_TODAS = ['vivo','entrar','registro','reglamento','cronograma','instruc
 
 var rutaActual = "vivo";
 var ligaActual = LIGA_PREDETERMINADA;
-var temporizador = null;
-var promptInstalar = null;
+var confirmada = false;      /* el usuario ya dijo que sí ve el tablero */
+var ligasProbadas = [];
+var relojPregunta = null;
+var codigoGuardado = '';     /* el código del participante, recordado aquí */
 
 document.getElementById('tituloApp').textContent = TITULO;
 document.getElementById('subtituloApp').textContent = SUBTITULO;
 document.title = TITULO;
 
-/* --------------------------- la liga --------------------------- */
+/* --------------------- memoria del dispositivo --------------------- */
+function leer(clave){
+  try{ return localStorage.getItem(clave); }catch(e){ return null; }
+}
+function guardar(clave, valor){
+  try{ localStorage.setItem(clave, valor); }catch(e){}
+}
+function borrar(clave){
+  try{ localStorage.removeItem(clave); }catch(e){}
+}
+
 (function(){
-  var guardada = null;
-  try{ guardada = localStorage.getItem('ajedrezjb_liga'); }catch(e){}
-  if(guardada && LIGAS[guardada]) ligaActual = guardada;
+  var g = leer('ajedrezjb_liga');
+  if(g && LIGAS[g]) ligaActual = g;
+  confirmada = (leer('ajedrezjb_confirmada') === '1');
+  codigoGuardado = leer('ajedrezjb_codigo') || '';
 })();
 
+/* ===================================================================
+   EL CÓDIGO DEL PARTICIPANTE
+
+   Se guarda AQUÍ, en la cáscara, y no del lado de Apps Script. Dentro
+   del marco de Google el almacenamiento cuenta como "de terceros": los
+   iPhone lo bloquean y Chrome lo reparte por sitio. Aquí es nuestro y
+   dura.
+
+   El trato con la página del torneo:
+     · al abrir «Mi acceso» se le manda el código en la liga (&c=...)
+     · ella avisa de vuelta: entró bien, el código ya no sirve, o salió
+   =================================================================== */
+
+function pintarSesion(){
+  var hay = !!codigoGuardado;
+  document.getElementById('navEntrar').classList.toggle('con-sesion', hay);
+  document.getElementById('opcionSalir').classList.toggle('oculta', !hay);
+  document.getElementById('opcionSinCodigo').classList.toggle('oculta', hay);
+  if(hay){
+    document.getElementById('textoSesion').textContent =
+      'Olvida el código ' + codigoGuardado + ' guardado en este celular';
+  }
+}
+
+function guardarCodigo(c){
+  if(!c) return;
+  codigoGuardado = String(c).toUpperCase();
+  guardar('ajedrezjb_codigo', codigoGuardado);
+  pintarSesion();
+}
+
+function olvidarCodigo(){
+  codigoGuardado = '';
+  borrar('ajedrezjb_codigo');
+  pintarSesion();
+  cerrarHoja();
+  cargar('entrar');
+}
+
+/* Lo que la página del torneo nos cuenta. Solo se escucha a Google. */
+window.addEventListener('message', function(ev){
+  var o = String(ev.origin || '');
+  var esDeGoogle = /\.googleusercontent\.com$/.test(o) || o === 'https://script.google.com';
+  if(!esDeGoogle) return;
+
+  var d = ev.data;
+  if(!d || d.de !== 'torneo-ajedrez-jb') return;
+
+  if(d.accion === 'codigo-ok')    guardarCodigo(d.codigo);
+  if(d.accion === 'codigo-malo')  { codigoGuardado=''; borrar('ajedrezjb_codigo'); pintarSesion(); }
+  if(d.accion === 'salir')        { codigoGuardado=''; borrar('ajedrezjb_codigo'); pintarSesion(); }
+});
+
+/* --------------------------- la liga --------------------------- */
 function textoDeLiga(){
   var t = document.getElementById('textoLiga');
   if(!t) return;
@@ -353,26 +511,34 @@ function textoDeLiga(){
     : 'Ahora usa la liga alterna. Tócalo para volver a la normal.';
 }
 
-function cambiarLiga(){
+function cambiarLiga(desdeElMenu){
   ligaActual = (ligaActual === 'plana') ? 'tilde' : 'plana';
-  try{ localStorage.setItem('ajedrezjb_liga', ligaActual); }catch(e){}
+  guardar('ajedrezjb_liga', ligaActual);
   textoDeLiga();
   cerrarHoja();
+  if(desdeElMenu){
+    confirmada = false;
+    guardar('ajedrezjb_confirmada', '0');
+    ligasProbadas = [];
+  }
   cargar(rutaActual);
 }
 
 /* --------------------------- utilidades --------------------------- */
 function mostrarCapa(id){
-  ['capaCarga','capaOffline','capaLenta','capaConfig'].forEach(function(c){
+  ['capaCarga','capaOffline','capaConfig','capaAyuda'].forEach(function(c){
     document.getElementById(c).classList.remove('visible');
   });
   if(id) document.getElementById(id).classList.add('visible');
 }
-function cerrarCapa(id){ document.getElementById(id).classList.remove('visible'); }
 
 function ligaDe(ruta){
-  var base = LIGAS[ligaActual];
-  return base + '?p=' + encodeURIComponent(ruta);
+  var u = LIGAS[ligaActual] + '?p=' + encodeURIComponent(ruta);
+  /* el código solo viaja a la pantalla que lo necesita */
+  if(ruta === 'entrar' && codigoGuardado){
+    u += '&c=' + encodeURIComponent(codigoGuardado);
+  }
+  return u;
 }
 
 function marcarNav(ruta){
@@ -386,13 +552,9 @@ function cargar(ruta){
   if(!navigator.onLine){ mostrarCapa('capaOffline'); return; }
   rutaActual = ruta;
   marcarNav(ruta);
-  /* solo se recuerda una pantalla del menú de abajo, no un documento suelto */
-  if(RUTAS_NAV.indexOf(ruta) >= 0){
-    try{ localStorage.setItem('ajedrezjb_ruta', ruta); }catch(e){}
-  }
+  if(RUTAS_NAV.indexOf(ruta) >= 0) guardar('ajedrezjb_ruta', ruta);
+  ocultarPregunta();
   mostrarCapa('capaCarga');
-  clearTimeout(temporizador);
-  temporizador = setTimeout(function(){ mostrarCapa('capaLenta'); }, 15000);
   document.getElementById('vista').src = ligaDe(ruta);
 }
 
@@ -404,10 +566,52 @@ function abrirFuera(){
   window.open(ligaDe(rutaActual), '_blank', 'noopener');
 }
 
-document.getElementById('vista').addEventListener('load', function(){
-  clearTimeout(temporizador);
+function reintentarTodo(){
+  confirmada = false;
+  guardar('ajedrezjb_confirmada', '0');
+  ligasProbadas = [];
   mostrarCapa(null);
+  cargar(rutaActual);
+}
+
+/* El marco avisa "load" tanto con el tablero como con la pantalla de
+   error de Google, así que no sirve para saber si cargó bien. */
+document.getElementById('vista').addEventListener('load', function(){
+  mostrarCapa(null);
+  if(confirmada) return;
+  if(document.getElementById('bienvenida').classList.contains('visible')) return;
+  clearTimeout(relojPregunta);
+  relojPregunta = setTimeout(mostrarPregunta, SEGUNDOS_PREGUNTA * 1000);
 });
+
+/* --------------------------- la pregunta --------------------------- */
+function mostrarPregunta(){
+  if(confirmada) return;
+  if(document.getElementById('bienvenida').classList.contains('visible')) return;
+  var yaProbadas = ligasProbadas.indexOf(ligaActual) >= 0;
+  document.getElementById('preguntaTexto').textContent =
+    yaProbadas ? '¿Y ahora sí ves el tablero?' : '¿Ya ves el tablero del torneo?';
+  document.getElementById('pregunta').classList.add('visible');
+}
+
+function ocultarPregunta(){
+  clearTimeout(relojPregunta);
+  document.getElementById('pregunta').classList.remove('visible');
+}
+
+function respuestaSi(){
+  confirmada = true;
+  guardar('ajedrezjb_confirmada', '1');
+  guardar('ajedrezjb_liga', ligaActual);
+  ocultarPregunta();
+}
+
+function respuestaNo(){
+  ocultarPregunta();
+  if(ligasProbadas.indexOf(ligaActual) < 0) ligasProbadas.push(ligaActual);
+  if(ligasProbadas.length >= 2){ mostrarCapa('capaAyuda'); return; }
+  cambiarLiga(false);
+}
 
 /* --------------------------- navegación --------------------------- */
 document.querySelectorAll('nav button').forEach(function(b){
@@ -417,6 +621,7 @@ document.querySelectorAll('nav button').forEach(function(b){
 /* ------------------------ hoja de opciones ------------------------ */
 function abrirHoja(){
   textoDeLiga();
+  pintarSesion();
   document.getElementById('fondoHoja').classList.add('visible');
 }
 function cerrarHoja(){ document.getElementById('fondoHoja').classList.remove('visible'); }
@@ -429,54 +634,69 @@ document.getElementById('fondoHoja').addEventListener('click', function(e){
 window.addEventListener('offline', function(){ mostrarCapa('capaOffline'); });
 window.addEventListener('online',  function(){ cargar(rutaActual); });
 
-/* --------------------------- instalación --------------------------- */
+/* =================== INSTALACIÓN Y BIENVENIDA =================== */
 var esIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 var yaInstalada = window.matchMedia('(display-mode: standalone)').matches ||
                   window.navigator.standalone === true;
+var promptInstalar = null;
+
+function cerrarIOS(){ document.getElementById('capaIOS').classList.remove('visible'); }
+
+/* La bienvenida sale a quien llega por el QR y todavía no tiene la app.
+   Nunca a quien ya la instaló, y nunca dos veces en el mismo celular. */
+function tocaBienvenida(){
+  if(yaInstalada) return false;
+  if(leer('ajedrezjb_bienvenida') === '1') return false;
+  return true;
+}
+
+function mostrarBienvenida(){
+  document.getElementById('bienvenida').classList.add('visible');
+  ocultarPregunta();
+}
+
+function cerrarBienvenida(){
+  guardar('ajedrezjb_bienvenida', '1');
+  document.getElementById('bienvenida').classList.remove('visible');
+  /* la pregunta de la liga quedó en pausa mientras la bienvenida estaba arriba */
+  if(!confirmada){
+    clearTimeout(relojPregunta);
+    relojPregunta = setTimeout(mostrarPregunta, SEGUNDOS_PREGUNTA * 1000);
+  }
+}
+
+function saltarBienvenida(){ cerrarBienvenida(); }
 
 window.addEventListener('beforeinstallprompt', function(e){
   e.preventDefault();
   promptInstalar = e;
-  var oculto = false;
-  try{ oculto = localStorage.getItem('ajedrezjb_no_instalar') === '1'; }catch(err){}
-  if(!yaInstalada && !oculto){
-    setTimeout(function(){
-      document.getElementById('barra-instalar').classList.add('visible');
-    }, 2500);
-  }
 });
 
 function pedirInstalacion(){
   cerrarHoja();
-  document.getElementById('barra-instalar').classList.remove('visible');
   if(promptInstalar){
+    cerrarBienvenida();
     promptInstalar.prompt();
     promptInstalar.userChoice.then(function(){ promptInstalar = null; });
-  }else if(esIOS){
-    document.getElementById('capaIOS').classList.add('visible');
-  }else if(yaInstalada){
-    alert('La aplicación ya está instalada en este dispositivo.');
-  }else{
-    alert('Busca en el menú de tu navegador la opción "Instalar aplicación" o "Agregar a pantalla de inicio".');
+    return;
+  }
+  if(yaInstalada){
+    cerrarBienvenida();
+    return;
+  }
+  /* Sin diálogo del sistema (iPhone siempre, y Android cuando Chrome
+     todavía no lo ofrece): se enseñan los pasos a mano. */
+  document.getElementById('capaIOS').classList.add('visible');
+  if(!esIOS){
+    document.querySelector('#capaIOS h2').textContent = 'Instalar la aplicación';
+    document.querySelector('#capaIOS .pasos-ios').innerHTML =
+      '<li>Abre el menú <b>⋮</b> de tu navegador.</li>' +
+      '<li>Busca <b>Instalar aplicación</b> o <b>Agregar a pantalla principal</b>.</li>' +
+      '<li>Confirma y listo: queda el ícono.</li>';
   }
 }
-document.getElementById('btnInstalar').addEventListener('click', pedirInstalacion);
+document.getElementById('btnInstalarBien').addEventListener('click', pedirInstalacion);
 document.getElementById('opcionInstalar').addEventListener('click', pedirInstalacion);
-document.getElementById('btnNoInstalar').addEventListener('click', function(){
-  document.getElementById('barra-instalar').classList.remove('visible');
-  try{ localStorage.setItem('ajedrezjb_no_instalar','1'); }catch(e){}
-});
-
-/* el iPhone no dispara beforeinstallprompt: el aviso se arma aparte */
-if(esIOS && !yaInstalada){
-  var ocultoIOS = false;
-  try{ ocultoIOS = localStorage.getItem('ajedrezjb_no_instalar') === '1'; }catch(e){}
-  if(!ocultoIOS){
-    setTimeout(function(){
-      document.getElementById('barra-instalar').classList.add('visible');
-    }, 3000);
-  }
-}
 
 /* --------------------------- service worker --------------------------- */
 if('serviceWorker' in navigator){
@@ -496,10 +716,12 @@ if('serviceWorker' in navigator){
   if(pedida && RUTAS_TODAS.indexOf(pedida) >= 0){
     inicial = pedida;
   }else{
-    var guardada = null;
-    try{ guardada = localStorage.getItem('ajedrezjb_ruta'); }catch(e){}
+    var guardada = leer('ajedrezjb_ruta');
     if(guardada && RUTAS_NAV.indexOf(guardada) >= 0) inicial = guardada;
   }
+
+  pintarSesion();
+  if(tocaBienvenida()) mostrarBienvenida();
   cargar(inicial);
 })();
 </script>
